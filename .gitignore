@@ -1,2 +1,4 @@
 # Project exclude paths
 /target/
+/flowable-demo.iml
+/.idea/
