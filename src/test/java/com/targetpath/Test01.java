@@ -1,6 +1,7 @@
 package com.targetpath;
 
 import org.flowable.engine.*;
+import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -143,6 +144,7 @@ public class Test01 {
      * 查询流程定义的任务
      */
     @Test
+    @Ignore
     public void testQueryTask(){
         ProcessEngine processEngine = processEngineConfiguration.buildProcessEngine();
         TaskService taskService = processEngine.getTaskService();
@@ -160,5 +162,36 @@ public class Test01 {
         }
     }
 
+    @Test
+    @Ignore
+    public void testCompleteTask(){
+        ProcessEngine processEngine = processEngineConfiguration.buildProcessEngine();
+        TaskService taskService = processEngine.getTaskService();
+        Task task = taskService.createTaskQuery()
+                .processDefinitionKey("holidayRequest")
+                .taskAssignee("钟登博")
+                .singleResult();
 
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("approved",false);
+
+        taskService.complete(task.getId(),map);
+    }
+
+    @Test
+    public void testQueryHistory(){
+        ProcessEngine processEngine = processEngineConfiguration.buildProcessEngine();
+        HistoryService historyService = processEngine.getHistoryService();
+        List<HistoricActivityInstance> list = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId("holidayRequest:1:7503")
+                .finished()
+                .orderByHistoricActivityInstanceEndTime().asc()
+                .list();
+        for (HistoricActivityInstance history: list){
+            System.out.println("history.getActivityId() = " + history.getActivityId());
+            System.out.println("history.getDurationInMillis() = " + history.getDurationInMillis());
+            System.out.println("history.getActivityName() = " + history.getActivityName());
+            System.out.println("history.getAssignee() = " + history.getAssignee());
+        }
+    }
 }
