@@ -34,7 +34,7 @@ public class Test01 {
 
         processEngineConfiguration.setJdbcDriver("com.mysql.cj.jdbc.Driver");
         processEngineConfiguration.setJdbcUsername("root");
-        processEngineConfiguration.setJdbcPassword("GTMCmail8800");
+        processEngineConfiguration.setJdbcPassword("root");
         processEngineConfiguration.setJdbcUrl("jdbc:mysql://localhost:3306/auth-center?serverTimeZone=UTC&nullCatalogMeansCurrent=true");
 
         // 如果数据库中的表结构不存在就新建
@@ -55,7 +55,7 @@ public class Test01 {
 
         processEngineConfiguration.setJdbcDriver("com.mysql.cj.jdbc.Driver");
         processEngineConfiguration.setJdbcUsername("root");
-        processEngineConfiguration.setJdbcPassword("GTMCmail8800");
+        processEngineConfiguration.setJdbcPassword("root");
         processEngineConfiguration.setJdbcUrl("jdbc:mysql://localhost:3306/auth-center?serverTimeZone=UTC&nullCatalogMeansCurrent=true");
 
         // 如果数据库中的表结构不存在就新建
@@ -131,7 +131,7 @@ public class Test01 {
         HashMap<String, Object> variables = new HashMap<>();
         variables.put("employee","钟登博");
         variables.put("nrOfHoildays",3);
-        variables.put("desciption","工作累了，离职");
+        variables.put("desciption","不干了，离职");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("holidayRequest", variables);
 
         System.out.println("processInstance.getProcessDefinitionId() = " + processInstance.getProcessDefinitionId());
@@ -144,7 +144,7 @@ public class Test01 {
      * 查询流程定义的任务
      */
     @Test
-    @Ignore
+//    @Ignore
     public void testQueryTask(){
         ProcessEngine processEngine = processEngineConfiguration.buildProcessEngine();
         TaskService taskService = processEngine.getTaskService();
@@ -162,6 +162,14 @@ public class Test01 {
         }
     }
 
+    /** 
+     * @Description  完成一个任务
+            
+     * @Author Zhong-Dengbo
+     * @Date 10:59 2022/10/5
+     * @Param []
+     * @return void
+     **/
     @Test
     @Ignore
     public void testCompleteTask(){
@@ -179,6 +187,7 @@ public class Test01 {
     }
 
     @Test
+    @Ignore
     public void testQueryHistory(){
         ProcessEngine processEngine = processEngineConfiguration.buildProcessEngine();
         HistoryService historyService = processEngine.getHistoryService();
@@ -192,6 +201,26 @@ public class Test01 {
             System.out.println("history.getDurationInMillis() = " + history.getDurationInMillis());
             System.out.println("history.getActivityName() = " + history.getActivityName());
             System.out.println("history.getAssignee() = " + history.getAssignee());
+        }
+    }
+
+    @Test
+    @Ignore
+    public void testSuspended(){
+        ProcessEngine processEngine = processEngineConfiguration.buildProcessEngine();
+        RepositoryService repositoryService = processEngine.getRepositoryService();
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+                .processDefinitionId("holidayRequest:1:3")
+                .singleResult();
+        boolean suspended = processDefinition.isSuspended();
+        System.out.println("suspended = " + suspended);
+        if (suspended){
+            System.out.println("processDefinition.getId()+processDefinition.getName() = " + processDefinition.getId() + processDefinition.getName());
+            repositoryService.activateProcessDefinitionById("holidayRequest:1:3");
+        }else{
+            System.out.println("processDefinition.getId()+processDefinition.getName() = " + processDefinition.getId() + processDefinition.getName());
+            repositoryService.suspendProcessDefinitionById("holidayRequest:1:3");
+
         }
     }
 }
